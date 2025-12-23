@@ -1,10 +1,78 @@
 import sympy as sp
+from sympy.plotting import plot
 
 
 def main():
-    point_arc_coincident_ang()
+    arc_len()
+    # point_arc_coincident_ang()
     # horizontal_point_line_dist()
     # vertical_point_line_dist()
+
+
+def arc_len():
+    # Start of arc
+    a = sp.Matrix(sp.symbols("ax ay", real=True))
+    # End of arc
+    b = sp.Matrix(sp.symbols("bx by", real=True))
+    # Center of arc
+    c = sp.Matrix(sp.symbols("cx cy", real=True))
+    # Desired arc length distance
+    d = sp.symbols("d", real=True)
+
+    u = a - c
+    v = b - c
+    ux = u[0]
+    uy = u[1]
+    vx = v[0]
+    vy = v[1]
+
+    r = u.norm()
+    r2 = r**2
+
+    cos_theta = u.dot(v) / r2
+    sin_theta = (ux * vy - uy * vx) / r2
+    # Target angle
+    alpha = d / r
+
+    # Residuals
+    res0 = cos_theta - sp.cos(alpha)
+    res1 = sin_theta - sp.sin(alpha)
+
+    test_rad = 5
+    test_satisfied = res0.subs(
+        {
+            # theta = 0
+            a[0]: test_rad,
+            a[1]: 0,
+            # theta = 90deg
+            b[0]: 0,
+            b[1]: test_rad,
+            # center = origin
+            c[0]: 0,
+            c[1]: 0,
+            # distance = 1/4 circle
+            d: 2 * sp.pi * test_rad / 4,
+        }
+    )
+
+    # print("test_satisfied:", test_satisfied)
+    # print("test_satisfied:", test_satisfied.evalf())
+    assert test_satisfied.evalf() == 0
+
+    # print(f"let res0 = {sp.rust_code(res0)};")
+    # print(f"let res1 = {sp.rust_code(res1)};")
+    print(f"let r0dax = {sp.rust_code(sp.simplify(res0.diff(a[0])))};")
+    print(f"let r0day = {sp.rust_code(sp.simplify(res0.diff(a[1])))};")
+    print(f"let r0dbx = {sp.rust_code(sp.simplify(res0.diff(b[0])))};")
+    print(f"let r0dby = {sp.rust_code(sp.simplify(res0.diff(b[1])))};")
+    print(f"let r0dcx = {sp.rust_code(sp.simplify(res0.diff(c[0])))};")
+    print(f"let r0dcy = {sp.rust_code(sp.simplify(res0.diff(c[1])))};")
+    print(f"let r1dax = {sp.rust_code(sp.simplify(res1.diff(a[0])))};")
+    print(f"let r1day = {sp.rust_code(sp.simplify(res1.diff(a[1])))};")
+    print(f"let r1dbx = {sp.rust_code(sp.simplify(res1.diff(b[0])))};")
+    print(f"let r1dby = {sp.rust_code(sp.simplify(res1.diff(b[1])))};")
+    print(f"let r1dcx = {sp.rust_code(sp.simplify(res1.diff(c[0])))};")
+    print(f"let r1dcy = {sp.rust_code(sp.simplify(res1.diff(c[1])))};")
 
 
 def cross2(u, v):
