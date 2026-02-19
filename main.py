@@ -27,11 +27,15 @@ def circle_circle_tangent():
     # External tangency is when the two circles are side-by-side, and touch at a single point.
     # First residual equation, for internal tangency.
     # euclideanDistance(center0, center1) = abs(radius0 - radius1).
-    residual_internal = center0.distance(center1) - sp.Abs(radius0 - radius1)
+    # Suggestion is to use squared distance.
+    sq_dist = center0.distance(center1) ** 2
+    residual_internal = sq_dist - (radius0 - radius1) ** 2
+    # print(f"let res_internal = {sp.rust_code(residual_internal)};")
 
     # Second residual equation, for external tangency.
     # euclideanDistance(center0, center1) = radius0 + radius1.
-    residual_external = center0.distance(center1) - radius0 - radius1
+    residual_external = sq_dist - (radius0 + radius1) ** 2
+    # print(f"let res_external = {sp.rust_code(residual_external)};")
 
 
 def arc_len():
