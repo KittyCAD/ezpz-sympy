@@ -3,10 +3,35 @@ from sympy.plotting import plot
 
 
 def main():
-    arc_len()
+    circle_circle_tangent()
+    # arc_len()
     # point_arc_coincident_ang()
     # horizontal_point_line_dist()
     # vertical_point_line_dist()
+
+
+def circle_circle_tangent():
+    # Define variables
+    # First circle
+    c0 = sp.Matrix(sp.symbols("cx0 cy0", real=True))
+    center0 = sp.Point2D(c0[0], c0[1])
+    radius0 = sp.symbols("r0", real=True)
+    # Second circle
+    c1 = sp.Matrix(sp.symbols("cx1 cy1", real=True))
+    center1 = sp.Point2D(c1[0], c1[1])
+    radius1 = sp.symbols("r1", real=True)
+
+    # There's two ways for the circles to be tangent: internal or external.
+    # Internal tangency is when one circle is inside the other, and they touch at a single
+    # point.
+    # External tangency is when the two circles are side-by-side, and touch at a single point.
+    # First residual equation, for internal tangency.
+    # euclideanDistance(center0, center1) = abs(radius0 - radius1).
+    residual_internal = center0.distance(center1) - sp.Abs(radius0 - radius1)
+
+    # Second residual equation, for external tangency.
+    # euclideanDistance(center0, center1) = radius0 + radius1.
+    residual_external = center0.distance(center1) - radius0 - radius1
 
 
 def arc_len():
