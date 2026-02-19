@@ -30,12 +30,52 @@ def circle_circle_tangent():
     # Suggestion is to use squared distance.
     sq_dist = center0.distance(center1) ** 2
     residual_internal = sq_dist - (radius0 - radius1) ** 2
-    # print(f"let res_internal = {sp.rust_code(residual_internal)};")
+    print(f"let res_internal = {sp.rust_code(residual_internal)};")
 
     # Second residual equation, for external tangency.
     # euclideanDistance(center0, center1) = radius0 + radius1.
     residual_external = sq_dist - (radius0 + radius1) ** 2
-    # print(f"let res_external = {sp.rust_code(residual_external)};")
+    print(f"let res_external = {sp.rust_code(residual_external)};")
+
+    # Calculate the partial derivatives for each residual.
+    print("// Internal partial derivatives")
+    print(
+        f"let d_int_c0x = {sp.rust_code(sp.simplify(residual_internal.diff(c0[0])))};"
+    )
+    print(
+        f"let d_int_c0y = {sp.rust_code(sp.simplify(residual_internal.diff(c0[1])))};"
+    )
+    print(
+        f"let d_int_r0 = {sp.rust_code(sp.simplify(residual_internal.diff(radius0)))};"
+    )
+    print(
+        f"let d_int_c1x = {sp.rust_code(sp.simplify(residual_internal.diff(c1[0])))};"
+    )
+    print(
+        f"let d_int_c1y = {sp.rust_code(sp.simplify(residual_internal.diff(c1[1])))};"
+    )
+    print(
+        f"let d_int_r1 = {sp.rust_code(sp.simplify(residual_internal.diff(radius1)))};"
+    )
+    print("// External partial derivatives")
+    print(
+        f"let d_ext_c0x = {sp.rust_code(sp.simplify(residual_external.diff(c0[0])))};"
+    )
+    print(
+        f"let d_ext_c0y = {sp.rust_code(sp.simplify(residual_external.diff(c0[1])))};"
+    )
+    print(
+        f"let d_ext_r0 = {sp.rust_code(sp.simplify(residual_external.diff(radius0)))};"
+    )
+    print(
+        f"let d_ext_c1x = {sp.rust_code(sp.simplify(residual_external.diff(c1[0])))};"
+    )
+    print(
+        f"let d_ext_c1y = {sp.rust_code(sp.simplify(residual_external.diff(c1[1])))};"
+    )
+    print(
+        f"let d_ext_r1 = {sp.rust_code(sp.simplify(residual_external.diff(radius1)))};"
+    )
 
 
 def arc_len():
