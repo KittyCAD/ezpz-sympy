@@ -39,7 +39,7 @@ def circle_circle_tangent():
     d = norm(ac - bc)
     residual_internal = abs(ar - br) - d
     residual_external = (ar + br) - d
-    is_internal = residual_internal < residual_external
+    is_internal = abs(residual_internal) < abs(residual_external)
 
     print(f"let residual_internal = {sp.rust_code(residual_internal)};")
     print(f"let residual_external = {sp.rust_code(residual_external)};")
