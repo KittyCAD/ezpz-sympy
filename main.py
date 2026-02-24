@@ -1,21 +1,91 @@
 import sympy as sp
-from sympy.plotting import plot
 
 
 def main():
-    arc_len()
+    circle_circle_tangent()
+    # arc_len()
     # point_arc_coincident_ang()
     # horizontal_point_line_dist()
     # vertical_point_line_dist()
 
 
+def norm(p: sp.Point):
+    """Distance from p to the origin, i.e. length of the vector"""
+    return p.distance(p.origin)
+
+
+def normalized(p: sp.Point) -> sp.Point:
+    """Unit vector pointing the same direction as p"""
+    return p / norm(p)
+
+
+def circle_circle_tangent():
+    # Define two circles, center x, center y, radius.
+    a = sp.Matrix(sp.symbols("ax ay ar", real=True))
+    b = sp.Matrix(sp.symbols("bx by br", real=True))
+    ax = a[0]
+    ay = a[1]
+    ac = sp.Point(ax, ay, evaluate=False)
+    ar = a[2]
+    bx = b[0]
+    by = b[1]
+    bc = sp.Point(bx, by, evaluate=False)
+    br = b[2]
+
+    # There's two ways for the circles to be tangent: internal or external.
+    # Internal tangency is when one circle is inside the other, and they touch at a single
+    # point.
+    # External tangency is when the two circles are side-by-side, and touch at a single point.
+    d = norm(ac - bc)
+    residual_internal = abs(ar - br) - d
+    residual_external = (ar + br) - d
+    is_internal = abs(residual_internal) < abs(residual_external)
+
+    print(f"let residual_internal = {sp.rust_code(residual_internal)};")
+    print(f"let residual_external = {sp.rust_code(residual_external)};")
+    print(f"let is_internal = {sp.rust_code(is_internal)};")
+
+    # Calculate the partial derivatives for each residual.
+    print("// partial derivatives")
+    g = normalized(bc - ac)
+    # These 4 partial derivatives can be calculated irrespective of whether
+    # the tangency is internal or external.
+    pd_ax = g[0]
+    pd_ay = g[1]
+    pd_bx = -g[0]
+    pd_by = -g[1]
+    # For these partial derivatives, we need to know if tangency is
+    # internal or external.
+    pd_ar_external = 1.0
+    pd_br_external = 1.0
+    # For internal tangency, the residual equation uses an absolute value,
+    # which is not smooth and nice to differentiate. So we check whether
+    # the inner (signed) value was positive or negative and simplify based on that.
+    # Used when ra > rb
+    pd_ar_internal_ra_greater = 1.0
+    pd_br_internal_ra_greater = -1.0
+    # Used when rb > ra
+    pd_ar_internal_rb_greater = -1.0
+    pd_br_internal_rb_greater = 1.0
+    print(f"let pd_ax = {sp.rust_code(pd_ax)}")
+    print(f"let pd_ay = {sp.rust_code(pd_ay)}")
+    print(f"let pd_bx = {sp.rust_code(pd_bx)}")
+    print(f"let pd_by = {sp.rust_code(pd_by)}")
+    print(f"let pd_ar_internal_ra_greater = {sp.rust_code(pd_ar_internal_ra_greater)}")
+    print(f"let pd_br_internal_ra_greater = {sp.rust_code(pd_br_internal_ra_greater)}")
+    print(f"let pd_ar_internal_rb_greater = {sp.rust_code(pd_ar_internal_rb_greater)}")
+    print(f"let pd_br_internal_rb_greater = {sp.rust_code(pd_br_internal_rb_greater)}")
+    print(f"let pd_ar_external = {sp.rust_code(pd_ar_external)}")
+    print(f"let pd_br_external = {sp.rust_code(pd_br_external)}")
+
+
 def arc_len():
     # Start of arc
-    a = sp.Matrix(sp.symbols("ax ay", real=True))
+    a = sp.Point(sp.symbols("ax ay", real=True))
     # End of arc
-    b = sp.Matrix(sp.symbols("bx by", real=True))
+    b = sp.Point(sp.symbols("bx by", real=True))
     # Center of arc
-    c = sp.Matrix(sp.symbols("cx cy", real=True))
+    c = sp.Point(sp.symbols("cx cy", real=True))
     # Desired arc length distance
     d = sp.symbols("d", real=True)
 
@@ -82,11 +152,11 @@ def cross2(u, v):
 
 def point_arc_coincident_ang():
     # The arc (a = start, b = end, counterclockwise from A to B)
-    c = sp.Matrix(sp.symbols("cx cy", real=True))
-    a = sp.Matrix(sp.symbols("ax ay", real=True))
-    b = sp.Matrix(sp.symbols("bx by", real=True))
+    c = sp.Point(sp.symbols("cx cy", real=True))
+    a = sp.Point(sp.symbols("ax ay", real=True))
+    b = sp.Point(sp.symbols("bx by", real=True))
 
-    p = sp.Matrix(sp.symbols("px py", real=True))
+    p = sp.Point(sp.symbols("px py", real=True))
     px = p[0]
     py = p[1]
     ax = a[0]
