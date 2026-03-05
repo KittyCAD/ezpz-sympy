@@ -2,7 +2,8 @@ import sympy as sp
 
 
 def main():
-    circle_circle_tangent()
+    point_point_var_dist()
+    # circle_circle_tangent()
     # arc_len()
     # point_arc_coincident_ang()
     # horizontal_point_line_dist()
@@ -17,6 +18,28 @@ def norm(p: sp.Point):
 def normalized(p: sp.Point) -> sp.Point:
     """Unit vector pointing the same direction as p"""
     return p / norm(p)
+
+
+def point_point_var_dist():
+    """Constraint for ensuring that two points are a certain distance away,
+    where that distance is itself an ezpz variable (not a constant)"""
+    p = sp.Point(sp.symbols("px py", real=True))
+    q = sp.Point(sp.symbols("qx qy", real=True))
+    d = sp.symbols("d", real=True)
+    residual = norm(p - q) - d
+    df_dp = normalized(p - q)
+    df_dpx = df_dp[0]
+    df_dpy = df_dp[1]
+    df_dq = -df_dp
+    df_dqx = df_dq[0]
+    df_dqy = df_dq[1]
+    df_dd = -1
+    print(f"let residual = {sp.rust_code(sp.simplify(residual))};")
+    print(f"let df_dpx = {sp.rust_code((df_dpx))};")
+    print(f"let df_dpy = {sp.rust_code((df_dpy))};")
+    print(f"let df_dqx = {sp.rust_code((df_dqx))};")
+    print(f"let df_dqy = {sp.rust_code((df_dqy))};")
+    print(f"let df_dd = {df_dd};")
 
 
 def circle_circle_tangent():
