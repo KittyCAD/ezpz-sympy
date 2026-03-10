@@ -2,7 +2,9 @@ import sympy as sp
 
 
 def main():
-    circle_circle_tangent()
+    # point_point_vardist()
+    arc_arc_tangent()
+    # circle_circle_tangent()
     # arc_len()
     # point_arc_coincident_ang()
     # horizontal_point_line_dist()
@@ -48,6 +50,79 @@ def circle_circle_tangent():
     # Calculate the partial derivatives for each residual.
     print("// partial derivatives")
     g = normalized(bc - ac)
+    # These 4 partial derivatives can be calculated irrespective of whether
+    # the tangency is internal or external.
+    pd_ax = g[0]
+    pd_ay = g[1]
+    pd_bx = -g[0]
+    pd_by = -g[1]
+    # For these partial derivatives, we need to know if tangency is
+    # internal or external.
+    pd_ar_external = 1.0
+    pd_br_external = 1.0
+    # For internal tangency, the residual equation uses an absolute value,
+    # which is not smooth and nice to differentiate. So we check whether
+    # the inner (signed) value was positive or negative and simplify based on that.
+    # Used when ra > rb
+    pd_ar_internal_ra_greater = 1.0
+    pd_br_internal_ra_greater = -1.0
+    # Used when rb > ra
+    pd_ar_internal_rb_greater = -1.0
+    pd_br_internal_rb_greater = 1.0
+    print(f"let pd_ax = {sp.rust_code(pd_ax)}")
+    print(f"let pd_ay = {sp.rust_code(pd_ay)}")
+    print(f"let pd_bx = {sp.rust_code(pd_bx)}")
+    print(f"let pd_by = {sp.rust_code(pd_by)}")
+    print(f"let pd_ar_internal_ra_greater = {sp.rust_code(pd_ar_internal_ra_greater)}")
+    print(f"let pd_br_internal_ra_greater = {sp.rust_code(pd_br_internal_ra_greater)}")
+    print(f"let pd_ar_internal_rb_greater = {sp.rust_code(pd_ar_internal_rb_greater)}")
+    print(f"let pd_br_internal_rb_greater = {sp.rust_code(pd_br_internal_rb_greater)}")
+    print(f"let pd_ar_external = {sp.rust_code(pd_ar_external)}")
+    print(f"let pd_br_external = {sp.rust_code(pd_br_external)}")
+
+
+def arc_arc_tangent():
+    # Two arcs, each with start/end/center, S/E/C.
+    # Twelve vars total (two arcs, each with 3 points, each with 2 dimensions)
+    a = sp.Matrix(sp.symbols("asx asy aex aey acx acy", real=True))
+    b = sp.Matrix(sp.symbols("bsx bsy bex bey bcx bcy", real=True))
+    asx = a[0]
+    asy = a[1]
+    aex = a[2]
+    aey = a[3]
+    acx = a[4]
+    acy = a[5]
+    a_s = sp.Point(asx, asy, evaluate=False)
+    a_e = sp.Point(aex, aey, evaluate=False)
+    a_c = sp.Point(acx, acy, evaluate=False)
+    bsx = b[0]
+    bsy = b[1]
+    bex = b[2]
+    bey = b[3]
+    bcx = b[4]
+    bcy = b[5]
+    b_s = sp.Point(bsx, bsy, evaluate=False)
+    b_e = sp.Point(bex, bey, evaluate=False)
+    b_c = sp.Point(bcx, bcy, evaluate=False)
+
+    # There's two ways for the circles to be tangent: internal or external.
+    # Internal tangency is when one circle is inside the other, and they touch at a single
+    # point.
+    # External tangency is when the two circles are side-by-side, and touch at a single point.
+    d = norm(a_c - b_c)
+    ar = a_s.distance(a_c)
+    br = b_s.distance(b_c)
+    residual_internal = abs(ar - br) - d
+    residual_external = (ar + br) - d
+    is_internal = abs(residual_internal) < abs(residual_external)
+
+    print(f"let residual_internal = {sp.rust_code(residual_internal)};")
+    print(f"let residual_external = {sp.rust_code(residual_external)};")
+    print(f"let is_internal = {sp.rust_code(is_internal)};")
+
+    # Calculate the partial derivatives for each residual.
+    print("// partial derivatives")
+    g = normalized(b_c - a_c)
     # These 4 partial derivatives can be calculated irrespective of whether
     # the tangency is internal or external.
     pd_ax = g[0]
